@@ -6,26 +6,40 @@ import { Square } from './components/Square.jsx'
 import { TURNS } from './constants.js'
 import { checkWinner, checkEndGame} from './logic/board.js'
 import { WinnerModal } from './components/WinnerModal.jsx'
+import { resetGameStorage, saveGameToStorage } from './logic/storage/index.js'
 
 import './App.css'
 
 
 function App() {
 
-  const [board, setBoard] = useState(Array(9).fill(null))
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    if(boardFromStorage) return JSON.parse(boardFromStorage)
+    return Array(9).fill(null)
+  })
 
-  const [turn, setTurn] = useState(TURNS.X)
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ?? TURNS.X
+  })
 
   const [winner, setWinner] = useState(null)
-
-  
 
   function resetGame(){
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+
+    resetGameStorage()
   }
 
+  function onlyResetGame(){
+    setBoard(Array(9).fill(null))
+    setTurn(TURNS.X)
+
+    resetGameStorage()
+  }
   
 
   function updateBoard(index){
@@ -39,11 +53,19 @@ function App() {
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
 
+    // guardar aquí partida
+    saveGameToStorage({
+      board: newBoard,
+      turn: newTurn
+    })
+
+
     // revisar si hay ganador 
     const newWinner = checkWinner(newBoard)
     if (newWinner){
       confetti()
-      setWinner(newWinner) 
+      setWinner(newWinner)
+      onlyResetGame()
     } else if(checkEndGame(newBoard)){
       setWinner(false)
     }
@@ -84,3 +106,6 @@ function App() {
 }
 
 export default App
+
+
+// añadir lista de ganadores anteriores

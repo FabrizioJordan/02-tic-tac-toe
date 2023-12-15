@@ -6,7 +6,7 @@ export const checkWinner = (boardToCheck) =>{
       if(
         boardToCheck[a] &&
         boardToCheck[a] === boardToCheck[b] && 
-        boardToCheck[a] ===  boardToCheck[c]
+        boardToCheck[a] === boardToCheck[c]
       ){
         return boardToCheck[a]
       }
